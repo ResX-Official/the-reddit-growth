@@ -16,7 +16,7 @@ const Header = ({ label }: HeaderProps) => {
     <div className="w-full flex flex-col items-center justify-center gap-2">
     <div className="flex items-center gap-2">
     <Image 
-    src="/redditgrowth.png" 
+    src="/red.png" 
     alt="Logo" 
     width={50} 
     height={50}

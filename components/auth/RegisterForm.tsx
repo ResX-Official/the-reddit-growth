@@ -63,14 +63,14 @@ const RegisterForm = () => {
     name="firstName"
     render={({ field }) => (
       <FormItem className="flex-1">
-      <FormLabel className="text-sm font-medium text-white/70">
+      <FormLabel className="text-sm font-medium text-white/70 hidden">
       First Name
       </FormLabel>
       <FormControl>
       <Input
       disabled={isPending}
       {...field}
-      placeholder="John"
+      placeholder="First Name"
       className="bg-background border-input hover:border-white/40 focus:border-white"
       />
       </FormControl>
@@ -83,14 +83,14 @@ const RegisterForm = () => {
     name="lastName"
     render={({ field }) => (
       <FormItem className="flex-1">
-      <FormLabel className="text-sm font-medium text-white/70">
+      <FormLabel className="text-sm font-medium text-white/70 hidden">
       Last Name
       </FormLabel>
       <FormControl>
       <Input
       disabled={isPending}
       {...field}
-      placeholder="Doe"
+      placeholder="Second Name"
       className="bg-background border-input hover:border-white/40 focus:border-white"
       />
       </FormControl>
@@ -105,7 +105,7 @@ const RegisterForm = () => {
     name="email"
     render={({ field }) => (
       <FormItem>
-      <FormLabel className="text-sm font-medium text-white/70">
+      <FormLabel className="text-sm font-medium text-white/70 hidden">
       Email
       </FormLabel>
       <FormControl>
@@ -127,7 +127,7 @@ const RegisterForm = () => {
     name="password"
     render={({ field }) => (
       <FormItem>
-      <FormLabel className="text-sm font-medium text-white/70">
+      <FormLabel className="text-sm font-medium text-white/70 hidden">
       Password
       </FormLabel>
       <FormControl>

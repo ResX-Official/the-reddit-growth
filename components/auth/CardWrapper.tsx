@@ -9,9 +9,9 @@ import {
   CardTitle,
   CardDescription,
 } from "../ui/card";
-import Header from "./Header";
 import { Jost } from "next/font/google";
 import BackButton from "./BackButton";
+import Header from "../common/Logo";
 
 interface CardWrapperProps {
   children: React.ReactNode;
