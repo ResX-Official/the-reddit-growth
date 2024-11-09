@@ -1,9 +1,7 @@
-"use client";
-
-import * as z from "zod";
-import { useState, useTransition } from "react";
-import CardWrapper from "./CardWrapper";
+'use client';
+import React, { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
+import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RegisterSchema } from "@/schemas";
 import {
@@ -13,15 +11,18 @@ import {
   FormItem,
   FormField,
   FormMessage,
-} from "../ui/form";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {UserIcon } from "lucide-react";
+import CardWrapper from "./CardWrapper";
 import FormError from "../common/FormError";
 import FormSuccess from "../common/FormSuccess";
 import { register } from "@/actions/register";
+import { EnvelopeClosedIcon, LockClosedIcon } from "@radix-ui/react-icons";
 
 const RegisterForm = () => {
-  const [isPending, startTransistion] = useTransition();
+  const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | undefined>();
   const [success, setSuccess] = useState<string | undefined>();
   
@@ -38,7 +39,7 @@ const RegisterForm = () => {
   const onSubmit = (values: z.infer<typeof RegisterSchema>) => {
     setError("");
     setSuccess("");
-    startTransistion(() => {
+    startTransition(() => {
       register(values).then((data) => {
         setError(data.error);
         setSuccess(data.success);
@@ -47,7 +48,7 @@ const RegisterForm = () => {
   };
   
   return (
-    <div className="text-white">
+    <div className="min-h-screen flex items-center justify-center p-4">
     <CardWrapper
     headerLabel="Create an Account"
     backButtonLabel="Already Have an Account?"
@@ -56,25 +57,28 @@ const RegisterForm = () => {
     >
     <Form {...form}>
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-    <div className="space-y-4">
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div className="space-y-6">
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
     <FormField
     control={form.control}
     name="firstName"
     render={({ field }) => (
-      <FormItem className="flex-1">
-      <FormLabel className="text-sm font-medium text-white/70 hidden">
+      <FormItem>
+      <FormLabel className="text-sm font-medium text-gray-300 hidden">
       First Name
       </FormLabel>
       <FormControl>
+      <div className="relative">
+      <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
       <Input
-      disabled={isPending}
       {...field}
+      disabled={isPending}
       placeholder="First Name"
-      className="bg-background border-input hover:border-white/40 focus:border-white"
+      className="pl-10 bg-gray-900/50 border-gray-700 text-white placeholder-gray-400 focus:border-red-500 focus:ring-red-500"
       />
+      </div>
       </FormControl>
-      <FormMessage className="text-xs text-orange-400 font-light" />
+      <FormMessage className="text-rose-500 text-xs mt-1" />
       </FormItem>
     )}
     />
@@ -82,19 +86,22 @@ const RegisterForm = () => {
     control={form.control}
     name="lastName"
     render={({ field }) => (
-      <FormItem className="flex-1">
-      <FormLabel className="text-sm font-medium text-white/70 hidden">
+      <FormItem>
+      <FormLabel className="text-sm font-medium text-gray-300 hidden">
       Last Name
       </FormLabel>
       <FormControl>
+      <div className="relative">
+      <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
       <Input
-      disabled={isPending}
       {...field}
-      placeholder="Second Name"
-      className="bg-background border-input hover:border-white/40 focus:border-white"
+      disabled={isPending}
+      placeholder="Last Name"
+      className="pl-10 bg-gray-900/50 border-gray-700 text-white placeholder-gray-400 focus:border-red-500 focus:ring-red-500"
       />
+      </div>
       </FormControl>
-      <FormMessage className="text-xs text-orange-400 font-light" />
+      <FormMessage className="text-rose-500 text-xs mt-1" />
       </FormItem>
     )}
     />
@@ -105,19 +112,22 @@ const RegisterForm = () => {
     name="email"
     render={({ field }) => (
       <FormItem>
-      <FormLabel className="text-sm font-medium text-white/70 hidden">
+      <FormLabel className="text-sm font-medium text-gray-300 hidden">
       Email
       </FormLabel>
       <FormControl>
+      <div className="relative">
+      <EnvelopeClosedIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
       <Input
-      disabled={isPending}
       {...field}
-      placeholder="john.doe@example.com"
       type="email"
-      className="bg-background border-input hover:border-white/40 focus:border-white"
+      disabled={isPending}
+      placeholder="you@example.com"
+      className="pl-10 bg-gray-900/50 border-gray-700 text-white placeholder-gray-400 focus:border-red-500 focus:ring-red-500"
       />
+      </div>
       </FormControl>
-      <FormMessage className="text-xs text-orange-400 font-light" />
+      <FormMessage className="text-rose-500 text-xs mt-1" />
       </FormItem>
     )}
     />
@@ -127,19 +137,22 @@ const RegisterForm = () => {
     name="password"
     render={({ field }) => (
       <FormItem>
-      <FormLabel className="text-sm font-medium text-white/70 hidden">
+      <FormLabel className="text-sm font-medium text-gray-300 hidden">
       Password
       </FormLabel>
       <FormControl>
+      <div className="relative">
+      <LockClosedIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
       <Input
       {...field}
-      placeholder="••••••••"
-      disabled={isPending}
       type="password"
-      className="bg-background border-input hover:border-white/40 focus:border-white"
+      disabled={isPending}
+      placeholder="••••••••"
+      className="pl-10 bg-gray-900/50 border-gray-700 text-white placeholder-gray-400 focus:border-red-500 focus:ring-red-500"
       />
+      </div>
       </FormControl>
-      <FormMessage className="text-xs text-orange-400 font-light" />
+      <FormMessage className="text-rose-500 text-xs mt-1" />
       </FormItem>
     )}
     />
@@ -149,12 +162,18 @@ const RegisterForm = () => {
     <FormSuccess message={success} />
     
     <Button
-    variant="default"
     type="submit"
-    className="w-full font-medium"
     disabled={isPending}
+    className="w-full bg-red-800 hover:bg-red-500 text-white font-medium py-2 px-4 rounded-lg transition-colors"
     >
-    {isPending ? "Creating Account..." : "Register a New Account"}
+    {isPending ? (
+      <div className="flex items-center justify-center gap-2">
+      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+      <span>Creating Account...</span>
+      </div>
+    ) : (
+      "Create Account"
+    )}
     </Button>
     </form>
     </Form>
