@@ -86,7 +86,7 @@ const AccountsPage = () => {
   const itemsPerPage = 3;
   
   const allAccounts = [
-    { id: 1, username: "Maverick-Coder", karma: 450 },
+    { id: 1, username: "Maverick-Coderr", karma: 450 },
     { id: 2, username: "TechGuru91", karma: 1023 },
     { id: 3, username: "CreativeThinker", karma: 780 },
     { id: 4, username: "EcoWarrior88", karma: 650 },
