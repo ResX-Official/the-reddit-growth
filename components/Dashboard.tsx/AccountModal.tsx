@@ -101,11 +101,11 @@ const AddAccountModal = () => {
     <div className="relative flex-1">
     <Input
     type="text"
-    placeholder="u/username"
+    placeholder="username"
     value={username}
     onChange={(e) => setUsername(e.target.value)}
     className="pl-4 pr-10 py-2 border-2 border-gray-200 focus:border-red-400 focus:ring-red-400 rounded-lg"
-    onKeyPress={(e) => {
+    onKeyDown={(e) => {
       if (e.key === 'Enter') {
         searchRedditUser();
       }
