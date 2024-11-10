@@ -66,8 +66,8 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
     </div>
     
     {/* Content container */}
-    <div className="relative container grid grid-cols-1 gap-2 lg:grid-cols-1 lg:gap-4 my-4 justify-center text-center">
-    <div className="h-screen rounded-lg text-center order-first lg:order-last mx-auto">
+    <div className="relative grid grid-cols-1 gap-2 lg:grid-cols-1 lg:gap-4 justify-center text-center">
+    <div className="rounded-lg text-center order-first lg:order-last mx-auto">
     {children}
     </div>
     </div>

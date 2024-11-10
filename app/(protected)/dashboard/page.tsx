@@ -3,16 +3,10 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { PlusIcon } from '@radix-ui/react-icons';
 import { handleSignOut } from '@/app/action';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Header from '@/components/common/Logo';
+import AddAccountModal from '@/components/Dashboard.tsx/AccountModal';
 
 // Logo Component
 
@@ -37,49 +31,6 @@ const UserAccountCard = ({ username, karma }: { username: string; karma: number 
   </Card>
 );
 
-const AddAccountModal = () => {
-  const [username, setUsername] = useState('');
-  
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Adding account:', username);
-  };
-  
-  return (
-    <Dialog>
-    <DialogTrigger asChild>
-    <button className="rounded-full bg-red-50 p-2 hover:bg-red-100 border border-red-300 shadow-sm">
-    <PlusIcon className="h-5 w-5 text-red-600" />
-    </button>
-    </DialogTrigger>
-    <DialogContent className="sm:max-w-md">
-    <DialogHeader>
-    <DialogTitle className="text-xl font-semibold text-red-900">Add Account</DialogTitle>
-    </DialogHeader>
-    <form onSubmit={handleSubmit} className="space-y-6 mt-4">
-    <div className="space-y-2">
-    <label htmlFor="username" className="text-sm font-medium text-red-700">
-    Reddit Username
-    </label>
-    <Input
-    id="username"
-    placeholder="Enter username"
-    value={username}
-    onChange={(e) => setUsername(e.target.value)}
-    className="w-full border-red-300 focus:border-red-500 focus:ring-red-500"
-    />
-    </div>
-    <Button 
-    type="submit"
-    className="w-full bg-red-600 text-white hover:bg-red-700"
-    >
-    Connect Reddit Account
-    </Button>
-    </form>
-    </DialogContent>
-    </Dialog>
-  );
-};
 
 const AccountsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -112,7 +63,7 @@ const AccountsPage = () => {
     <div className="py-5">
     <Header label='' />
     </div>
-    <div className="p-4 sm:p-6 lg:p-8">
+    <div className="p-4 sm:p-3 lg:p-4">
     <div className="mx-auto max-w-lg sm:max-w-xl lg:max-w-2xl">
     <div className="mb-2 flex items-center justify-between">
     <h1 className="text-xl sm:text-2xl font-bold text-red-900">My Accounts</h1>

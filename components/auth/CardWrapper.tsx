@@ -100,7 +100,7 @@ const CardWrapper = ({
       </CardFooter>
     )}
     
-    <CardFooter className="p-0 pt-4 border-t border-red-900/20 text-white/70">
+    <CardFooter className="p-0 pt-4 border-t border-red-900/20 text-white">
     <BackButton 
     href={backButtonHref} 
     label={backButtonLabel}

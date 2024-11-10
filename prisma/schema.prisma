@@ -33,6 +33,7 @@ model User {
   isTwoFactorEnabled Boolean   @default(false)
  
   @@map("users")
+  RedditAccount RedditAccount[]
 }
 model Account {
   id                 String  @id @default(cuid())
@@ -71,5 +72,18 @@ expires DateTime
 
 @@unique([email, token])
 
+}
+
+model RedditAccount {
+  id            String   @id @default(cuid())
+  userId        String
+  redditUsername String
+  accessToken   String
+  refreshToken  String
+  tokenExpires  DateTime
+  karmaCount    Int
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, redditUsername])
 }
 
