@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -7,89 +8,65 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useState, useCallback } from "react";
-import { Button } from "../ui/button";
-import { PlusIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import Cookies from 'js-cookie';
+import { PlusIcon, ExternalLinkIcon } from "lucide-react";
 
-interface RedditAuthResponse {
-  url?: string;
-  error?: string;
+interface RedditUser {
+  creationDate: string;
+  icon: string;
+  id: string;
+  karma: number;
+  name: string;
+  nsfw: boolean;
+  url: string;
 }
 
 const AddAccountModal = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
+  const [username, setUsername] = useState("");
+  const [userData, setUserData] = useState<RedditUser | null>(null);
   
-  const handleRedditAuth = useCallback(async () => {
+  const searchRedditUser = async () => {
     setIsLoading(true);
     setError("");
+    setUserData(null);
     
     try {
-      const state = crypto.randomUUID();
-      
-      // Store state in cookie
-      Cookies.set('redditAuthState', state, {
-        secure: true,
-        sameSite: 'strict',
-        expires: 1/24, // 1 hour
-        path: '/'
-      });
-      
-      console.log('Sending request to /api/reddit/auth-url');
-      
-      const response = await fetch('/api/reddit/auth-url', {
-        method: 'POST',
+      const response = await fetch(`https://reddit-scraper2.p.rapidapi.com/search_users?query=${username}&nsfw=0`, {
+        method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ state })
+          'x-rapidapi-key': '52655f1cfbmshc28794a26461c71p1a3967jsnc854ec10622d',
+          'x-rapidapi-host': 'reddit-scraper2.p.rapidapi.com'
+        }
       });
-      
-      console.log('Response status:', response.status);
-      
-      // Get response text first for debugging
-      const responseText = await response.text();
-      console.log('Raw response:', responseText);
-      
-      let data: RedditAuthResponse;
-      try {
-        data = JSON.parse(responseText);
-      } catch (e) {
-        console.error('Failed to parse response:', e);
-        throw new Error('Invalid server response format');
-      }
       
       if (!response.ok) {
-        throw new Error(data.error || `HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      if (!data?.url) {
-        throw new Error('No authorization URL received');
+      const responseData = await response.json();
+      
+      if (responseData.data && responseData.data.length > 0) {
+        // Get the first user from the results
+        setUserData(responseData.data[0]);
+      } else {
+        setError("No users found");
       }
-      
-      console.log('Redirecting to:', data.url);
-      
-      // Close modal before redirect
-      setIsOpen(false);
-      
-      // Redirect to Reddit auth page
-      window.location.href = data.url;
-      
     } catch (err) {
-      console.error('Reddit authentication error:', err);
+      console.error('Reddit search error:', err);
       setError(
         err instanceof Error
         ? err.message
-        : 'Failed to connect to Reddit. Please try again.'
+        : 'Failed to search Reddit user. Please try again.'
       );
-      setIsOpen(true); // Keep modal open on error
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  };
   
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -106,7 +83,7 @@ const AddAccountModal = () => {
     <DialogContent className="sm:max-w-md">
     <DialogHeader>
     <DialogTitle className="container text-xl font-semibold text-red-900">
-    Connect Reddit Account
+    Search Reddit Account
     </DialogTitle>
     </DialogHeader>
     <div className="space-y-6 mt-4">
@@ -115,23 +92,84 @@ const AddAccountModal = () => {
       <AlertDescription>{error}</AlertDescription>
       </Alert>
     )}
+    
+    <div className="space-y-4">
     <div className="text-sm text-gray-600">
-    Connect your Reddit account to access your subreddits and manage your subscriptions.
+    Enter a Reddit username to search for their profile.
     </div>
+    
+    <div className="flex gap-2">
+    <Input
+    type="text"
+    placeholder="Enter Reddit username"
+    value={username}
+    onChange={(e) => setUsername(e.target.value)}
+    className="flex-1"
+    onKeyPress={(e) => {
+      if (e.key === 'Enter') {
+        searchRedditUser();
+      }
+    }}
+    />
     <Button
-    onClick={handleRedditAuth}
-    disabled={isLoading}
-    className="w-full bg-red-600 text-white hover:bg-red-700 transition-colors duration-200"
+    onClick={searchRedditUser}
+    disabled={isLoading || !username}
+    className="bg-red-600 text-white hover:bg-red-700 transition-colors duration-200"
     >
     {isLoading ? (
-      <span className="flex items-center justify-center gap-2">
       <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-      <span>Connecting...</span>
-      </span>
     ) : (
-      "Connect with Reddit"
+      "Search"
     )}
     </Button>
+    </div>
+    
+    {userData && (
+      <div className="mt-4 p-4 bg-gray-50 rounded-lg space-y-4">
+      <div className="flex items-center gap-4">
+      <img 
+      src={userData.icon} 
+      alt="Profile" 
+      className="w-16 h-16 rounded-full"
+      onError={(e) => {
+        // Fallback if image fails to load
+        e.currentTarget.src = "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_1.png";
+      }}
+      />
+      <div>
+      <h3 className="font-medium text-gray-900">u/{userData.name}</h3>
+      <p className="text-sm text-gray-500">ID: {userData.id}</p>
+      </div>
+      </div>
+      
+      <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between">
+      <span className="text-gray-600">Karma:</span>
+      <span>{userData.karma.toLocaleString()}</span>
+      </div>
+      <div className="flex items-center justify-between">
+      <span className="text-gray-600">Created:</span>
+      <span>{new Date(userData.creationDate).toLocaleDateString()}</span>
+      </div>
+      <div className="flex items-center justify-between">
+      <span className="text-gray-600">NSFW:</span>
+      <span>{userData.nsfw ? "Yes" : "No"}</span>
+      </div>
+      <div className="pt-2">
+      <a
+      href={userData.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center justify-center gap-1 text-red-600 hover:text-red-700 w-full p-2 border border-red-200 rounded-md hover:bg-red-50 transition-colors"
+      >
+      Click to Add Reddit Account
+      <ExternalLinkIcon className="h-4 w-4" />
+      </a>
+      </div>
+      </div>
+      </div>
+    )}
+    </div>
     </div>
     </DialogContent>
     </Dialog>
