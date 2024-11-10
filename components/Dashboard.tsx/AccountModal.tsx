@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { PlusIcon, ExternalLinkIcon } from "lucide-react";
+import { PlusIcon, ExternalLinkIcon, SearchIcon } from "lucide-react";
 
 interface RedditUser {
   creationDate: string;
@@ -51,7 +51,6 @@ const AddAccountModal = () => {
       const responseData = await response.json();
       
       if (responseData.data && responseData.data.length > 0) {
-        // Get the first user from the results
         setUserData(responseData.data[0]);
       } else {
         setError("No users found");
@@ -73,51 +72,54 @@ const AddAccountModal = () => {
     <DialogTrigger asChild>
     <Button
     variant="outline"
-    className="rounded-full bg-red-50 p-2 hover:bg-red-100 border border-red-300 shadow-sm transition-colors duration-200"
+    className="rounded-full bg-white p-3 hover:bg-red-50 border-2 border-red-600 shadow-lg transition-all duration-300 hover:scale-105"
     onClick={() => setIsOpen(true)}
     aria-label="Add Reddit Account"
     >
     <PlusIcon className="h-5 w-5 text-red-600" />
     </Button>
     </DialogTrigger>
-    <DialogContent className="sm:max-w-md">
+    <DialogContent className="sm:max-w-md bg-white border-2 border-red-100 shadow-2xl">
     <DialogHeader>
-    <DialogTitle className="container text-xl font-semibold text-red-900">
-    Search Reddit Account
+    <DialogTitle className="text-2xl font-bold text-gray-900 text-center pb-2 border-b-2 border-red-100">
+    Add Reddit Account
     </DialogTitle>
     </DialogHeader>
-    <div className="space-y-6 mt-4">
+    <div className="space-y-6 mt-6">
     {error && (
-      <Alert variant="destructive">
+      <Alert variant="destructive" className="bg-red-50 border-red-200 text-red-800">
       <AlertDescription>{error}</AlertDescription>
       </Alert>
     )}
     
     <div className="space-y-4">
-    <div className="text-sm text-gray-600">
-    Enter a Reddit username to search for their profile.
+    <div className="text-sm text-gray-600 font-medium">
+    Enter a Reddit username to search for their profile
     </div>
     
     <div className="flex gap-2">
+    <div className="relative flex-1">
     <Input
     type="text"
-    placeholder="Enter Reddit username"
+    placeholder="u/username"
     value={username}
     onChange={(e) => setUsername(e.target.value)}
-    className="flex-1"
+    className="pl-4 pr-10 py-2 border-2 border-gray-200 focus:border-red-400 focus:ring-red-400 rounded-lg"
     onKeyPress={(e) => {
       if (e.key === 'Enter') {
         searchRedditUser();
       }
     }}
     />
+    <SearchIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+    </div>
     <Button
     onClick={searchRedditUser}
     disabled={isLoading || !username}
-    className="bg-red-600 text-white hover:bg-red-700 transition-colors duration-200"
+    className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
     >
     {isLoading ? (
-      <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+      <span className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
     ) : (
       "Search"
     )}
@@ -125,44 +127,44 @@ const AddAccountModal = () => {
     </div>
     
     {userData && (
-      <div className="mt-4 p-4 bg-gray-50 rounded-lg space-y-4">
+      <div className="mt-6 rounded-xl border-2 border-red-100 overflow-hidden">
+      <div className="bg-red-50 p-4">
       <div className="flex items-center gap-4">
       <img 
       src={userData.icon} 
       alt="Profile" 
-      className="w-16 h-16 rounded-full"
+      className="w-16 h-16 rounded-full border-2 border-white shadow-md"
       onError={(e) => {
-        // Fallback if image fails to load
         e.currentTarget.src = "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_1.png";
       }}
       />
       <div>
-      <h3 className="font-medium text-gray-900">u/{userData.name}</h3>
-      <p className="text-sm text-gray-500">ID: {userData.id}</p>
+      <h3 className="text-lg font-bold text-gray-900">u/{userData.name}</h3>
+      <p className="text-sm text-gray-500 font-mono">ID: {userData.id}</p>
+      </div>
       </div>
       </div>
       
-      <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between">
-      <span className="text-gray-600">Karma:</span>
-      <span>{userData.karma.toLocaleString()}</span>
+      <div className="p-4 bg-white space-y-3">
+      <div className="grid grid-cols-2 gap-2 text-sm">
+      <div className="p-2 bg-gray-50 rounded-lg">
+      <div className="text-gray-600 font-medium">Karma</div>
+      <div className="text-gray-900 font-bold">{userData.karma.toLocaleString()}</div>
       </div>
-      <div className="flex items-center justify-between">
-      <span className="text-gray-600">Created:</span>
-      <span>{new Date(userData.creationDate).toLocaleDateString()}</span>
+      <div className="p-2 bg-gray-50 rounded-lg">
+      <div className="text-gray-600 font-medium">Created</div>
+      <div className="text-gray-900 font-bold">{new Date(userData.creationDate).toLocaleDateString()}</div>
       </div>
-      <div className="flex items-center justify-between">
-      <span className="text-gray-600">NSFW:</span>
-      <span>{userData.nsfw ? "Yes" : "No"}</span>
       </div>
-      <div className="pt-2">
+      
+      <div className="pt-3">
       <a
       href={userData.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-center justify-center gap-1 text-red-600 hover:text-red-700 w-full p-2 border border-red-200 rounded-md hover:bg-red-50 transition-colors"
+      className="flex items-center justify-center gap-2 bg-red-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-red-700 transition-colors duration-300 shadow-md hover:shadow-lg"
       >
-      Click to Add Reddit Account
+      Connect Account
       <ExternalLinkIcon className="h-4 w-4" />
       </a>
       </div>
