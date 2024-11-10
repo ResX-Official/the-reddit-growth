@@ -2,7 +2,7 @@ import React from "react";
 
 const AuthLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden my-3">
     {/* Base gradient background */}
     <div className="fixed inset-0" 
     style={{
