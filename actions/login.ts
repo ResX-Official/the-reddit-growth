@@ -1,118 +1,66 @@
 "use server";
 
 import * as z from "zod";
-import { AuthError } from "next-auth";
 import bcrypt from "bcryptjs";
-
+import { AuthError } from "next-auth";
 import { signIn } from "@/auth";
 import { LoginSchema } from "@/schemas";
 import { getUserByEmail } from "@/data/user";
 import { sendVerificationEmail } from "@/lib/mail";
-import {
-  generateVerificationToken,
-} from "@/lib/token";
-import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
-import db from "@/lib/db";
+import { generateVerificationToken } from "@/lib/token";
+import { redirect } from "next/navigation";
 
-export const login = async (
-  values: z.infer<typeof LoginSchema>,
-  callbackUrl?: string | null
-) => {
+const ERROR_MESSAGES = {
+  INVALID_FIELDS: "Invalid fields!",
+  EMAIL_NOT_EXIST: "Email does not exist!",
+  CONFIRMATION_EMAIL_SENT: "Confirmation email sent!",
+  INVALID_CREDENTIALS: "Invalid credentials!",
+  SOMETHING_WENT_WRONG: "Something went wrong!",
+};
+
+export const login = async (values: z.infer<typeof LoginSchema>, callbackUrl?: string | null) => {
   const validatedFields = LoginSchema.safeParse(values);
-
+  
   if (!validatedFields.success) {
-    return { error: "Invalid fields!" };
+    return { error: ERROR_MESSAGES.INVALID_FIELDS };
   }
 
   const { email, password } = validatedFields.data;
-
   const existingUser = await getUserByEmail(email);
 
   if (!existingUser || !existingUser.email || !existingUser.password) {
-    return { error: "Email does not exist!" };
+    return { error: ERROR_MESSAGES.EMAIL_NOT_EXIST };
   }
 
   if (!existingUser.emailVerified) {
-    const verificationToken = await generateVerificationToken(
-      existingUser.email
-    );
-
-    await sendVerificationEmail(
-      verificationToken.email,
-      verificationToken.token
-    );
-
-    return { success: "Confirmation email Sent!" };
+    const verificationToken = await generateVerificationToken(existingUser.email);
+    await sendVerificationEmail(verificationToken.email, verificationToken.token);
+    return { success: ERROR_MESSAGES.CONFIRMATION_EMAIL_SENT };
   }
 
   const passwordMatch = await bcrypt.compare(password, existingUser.password);
-
   if (!passwordMatch) {
-    return { error: "Invalid Credentials!" };
+    return { error: ERROR_MESSAGES.INVALID_CREDENTIALS };
   }
 
-  // if (existingUser.isTwoFactorEnabled && existingUser.email) {
-  //   if (code) {
-  //     const twoFactorToken = await getTwoFactorTokenByEmail(existingUser.email);
-
-  //     if (!twoFactorToken) {
-  //       return { error: "Invalid code!" };
-  //     }
-
-  //     if (twoFactorToken.token !== code) {
-  //       return { error: "Invalid code!" };
-  //     }
-
-  //     const hasExpired = new Date(twoFactorToken.expires) < new Date();
-
-  //     if (hasExpired) {
-  //       return { error: "Code expired!" };
-  //     }
-
-  //     await db.twoFactorToken.delete({
-  //       where: { id: twoFactorToken.id },
-  //     });
-
-  //     const existingConfirmation = await getTwoFactorConfirmationByUserId(
-  //       existingUser.id
-  //     );
-
-  //     if (existingConfirmation) {
-  //       await db.twoFactorConfirmation.delete({
-  //         where: { id: existingConfirmation.id },
-  //       });
-  //     }
-
-  //     await db.twoFactorConfirmation.create({
-  //       data: {
-  //         userId: existingUser.id,
-  //       },
-  //     });
-  //   } else {
-  //     const twoFactorToken = await generateTwoFactorToken(existingUser.email);
-  //     await sendTwoFactorTokenEmail(twoFactorToken.email, twoFactorToken.token);
-
-  //     return { twoFactor: true };
-  //   }
-  // }
-
   try {
-    await signIn("credentials", {
-      email,
+    await signIn("credentials", { 
+      email, 
       password,
+      redirect: false, // Prevent automatic redirect
     });
-
-    // return { success: "Login Sucess!" };
+    
+    // If login is successful, redirect to the dashboard
+    redirect(callbackUrl || "/");
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
         case "CredentialsSignin":
-          return { error: "Invalid credentials!" };
+          return { error: ERROR_MESSAGES.INVALID_CREDENTIALS };
         default:
-          return { error: "Something went wrong!" };
+          return { error: ERROR_MESSAGES.SOMETHING_WENT_WRONG };
       }
     }
-
     throw error;
   }
 };
