@@ -2,7 +2,7 @@
 // These routes don't require authentication
 // @type {string[]}
 
-export const publicRoutes = ["/",
+export const publicRoutes = [
   "/auth/new-verification",
   "/dashboard",
   "/auth/verify-email",
