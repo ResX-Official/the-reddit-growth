@@ -59,7 +59,7 @@ const AccountsPage = () => {
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
   
   return (
-    <div className="min-h-screen bg-red-50 rounded-xl my-2">
+    <div className="min-h-screen bg-red-50 rounded-xl">
     <div className="py-5">
     <Header label='' />
     </div>
