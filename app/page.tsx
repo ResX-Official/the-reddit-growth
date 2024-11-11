@@ -7,6 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Header from '@/components/common/Logo';
 import AddAccountModal from '@/components/Dashboard/AccountModal';
+import { signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+
+
 
 // Logo Component
 
@@ -57,6 +61,14 @@ const AccountsPage = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const displayedAccounts = allAccounts.slice(startIndex, startIndex + itemsPerPage);
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
+  const router = useRouter();
+  
+  const handleLogout = async () => {
+    await signOut({ redirect: false });
+    router.refresh(); // Add this line to revalidate the page
+    router.push('/auth/login');
+  };
+  
   
   return (
     <div className="min-h-screen bg-red-50 rounded-xl">
@@ -121,6 +133,7 @@ const AccountsPage = () => {
     className="mt-6 flex justify-center"
     >
     <button
+    onClick={handleLogout}
     type="submit"
     className="px-4 py-2 bg-white border border-red-300 text-red-700 rounded-md hover:bg-red-50 shadow-sm"
     >

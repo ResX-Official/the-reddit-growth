@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from "react";
+import { addRedditAccount } from "@/app/actions/reddit";
 import {
   Dialog,
   DialogContent,
@@ -12,6 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PlusIcon, ExternalLinkIcon, SearchIcon } from "lucide-react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface RedditUser {
   creationDate: string;
@@ -23,7 +26,8 @@ interface RedditUser {
   url: string;
 }
 
-const AddAccountModal = () => {
+export default function AddAccountModal() {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
@@ -62,6 +66,41 @@ const AddAccountModal = () => {
         ? err.message
         : 'Failed to search Reddit user. Please try again.'
       );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const handleConnectAccount = async () => {
+    if (!userData) return;
+    
+    try {
+      setIsLoading(true);
+      
+      // Simulate getting tokens from OAuth flow
+      // In a real implementation, you would get these from the Reddit OAuth process
+      const mockTokens = {
+        accessToken: "mock_access_token",
+        refreshToken: "mock_refresh_token"
+      };
+      
+      const result = await addRedditAccount({
+        redditUsername: userData.name,
+        accessToken: mockTokens.accessToken,
+        refreshToken: mockTokens.refreshToken,
+        karmaCount: userData.karma
+      });
+      
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+      
+      toast.success("Reddit account connected successfully!");
+      setIsOpen(false);
+      router.refresh(); // Refresh the page to show updated data
+    } catch (err) {
+      console.error('Failed to connect account:', err);
+      toast.error(err instanceof Error ? err.message : "Failed to connect account");
     } finally {
       setIsLoading(false);
     }
@@ -153,20 +192,27 @@ const AddAccountModal = () => {
       </div>
       <div className="p-2 bg-gray-50 rounded-lg">
       <div className="text-gray-600 font-medium">Created</div>
-      <div className="text-gray-900 font-bold">{new Date(userData.creationDate).toLocaleDateString()}</div>
+      <div className="text-gray-900 font-bold">
+      {new Date(userData.creationDate).toLocaleDateString()}
+      </div>
       </div>
       </div>
       
       <div className="pt-3">
-      <a
-      href={userData.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex items-center justify-center gap-2 bg-red-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-red-700 transition-colors duration-300 shadow-md hover:shadow-lg"
+      <Button
+      onClick={handleConnectAccount}
+      disabled={isLoading}
+      className="w-full flex items-center justify-center gap-2 bg-red-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-red-700 transition-colors duration-300 shadow-md hover:shadow-lg"
       >
-      Connect Account
-      <ExternalLinkIcon className="h-4 w-4" />
-      </a>
+      {isLoading ? (
+        <span className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+      ) : (
+        <>
+        Connect Account
+        <ExternalLinkIcon className="h-4 w-4" />
+        </>
+      )}
+      </Button>
       </div>
       </div>
       </div>
@@ -176,6 +222,4 @@ const AddAccountModal = () => {
     </DialogContent>
     </Dialog>
   );
-};
-
-export default AddAccountModal;
+}
