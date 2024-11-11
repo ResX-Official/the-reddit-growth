@@ -6,7 +6,7 @@ import { handleSignOut } from '@/app/action';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Header from '@/components/common/Logo';
-import AddAccountModal from '@/components/Dashboard.tsx/AccountModal';
+import AddAccountModal from '@/components/Dashboard/AccountModal';
 
 // Logo Component
 
