@@ -4,7 +4,18 @@
 
 export const publicRoutes = ["/",
   "/auth/new-verification",
-  "/dashboard"
+  "/dashboard",
+  "/settings",
+  "/auth/verify-email",
+  "/auth/new-password",
+  "/auth/reset",
+  "/auth/new-verification",
+  "/auth/new-password",
+  "/auth/login",
+  "/auth/register",
+  "/auth/error",
+  "/auth/reset",
+  "/auth/new-password"
 ];
 
 /*
