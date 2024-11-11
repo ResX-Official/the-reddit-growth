@@ -5,7 +5,7 @@ export const sendPasswordResetEmail = async (
   email: string,
   token: string,
 ) => {
-  const resetLink = `/auth/new-password?token=${token}`;
+  const resetLink = `https://app.redditgrowth.com/auth/new-password?token=${token}`;
   await resend.emails.send({
     from: "onboading@resend.dev",
     to: email,
@@ -21,7 +21,7 @@ export const sendPasswordResetEmail = async (
 export const sendVerificationEmail = async (
   email: string,
   token: string) => {
-  const confirmLink = `/auth/new-verification?token=${token}`;
+  const confirmLink = `https://app.redditgrowth.com/auth/new-verification?token=${token}`;
   await resend.emails.send({
     from: "onboading@resend.dev",
     to: email,
