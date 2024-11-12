@@ -75,8 +75,10 @@ const createEmailTemplate = (
 </head>
 <body>
     <div class="container">
-        <img src="/logo.png" alt="RedditGrowth Logo" class="logo" />
-        <h1><span>Reddit</span>Growth</h1>
+ <h1 className="text-4xl font-bold">
+      <span className="text-red-500">Reddit</span>
+      <span className="text-black">Growth</span>
+    </h1>        <h1><span>Reddit</span>Growth</h1>
         <p>${message}</p>
         <p style="text-align: center;">
             <a href="${buttonLink}" class="button">${buttonText}</a>
