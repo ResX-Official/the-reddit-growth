@@ -16,77 +16,103 @@ const createEmailTemplate = (
     <title>${title}</title>
     <style>
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             line-height: 1.6;
-            color: #333;
+            color: #1a1a1a;
             max-width: 600px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f4f4f4;
+            background-color: #f8f8f8;
         }
         .container {
             background-color: #ffffff;
-            border-radius: 8px;
-            padding: 30px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
-        .logo {
-            display: block;
-            margin: 0 auto 30px;
-            max-width: 200px;
+        .logo-container {
+            text-align: center;
+            margin-bottom: 32px;
         }
         h1 {
-            color: #000000;
             text-align: center;
-            margin-bottom: 20px;
-            font-size: 28px;
-            font-weight: bold;
+            margin-bottom: 24px;
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1.2;
         }
-        h1 span {
-            color: #800000;
+        .reddit-text {
+            color: #ff4500;
+        }
+        .growth-text {
+            color: #1a1a1a;
         }
         p {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             font-size: 16px;
-            color: #666;
+            color: #4a4a4a;
+            line-height: 1.8;
+        }
+        .button-container {
+            text-align: center;
+            margin: 32px 0;
         }
         .button {
             display: inline-block;
-            padding: 12px 24px;
-            background-color: #800000;
-            color: #ffffff;
+            padding: 14px 32px;
+            background-color: #ff4500;
+            color: #ffffff !important;
             text-decoration: none;
-            border-radius: 25px;
-            font-weight: bold;
-            text-align: center;
-            transition: background-color 0.3s ease;
-            font-size: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(255, 69, 0, 0.2);
         }
         .button:hover {
-            background-color: #800000;
+            background-color: #ff5722;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(255, 69, 0, 0.3);
+        }
+        .warning-text {
+            font-style: italic;
+            color: #666;
+            font-size: 14px;
+            text-align: center;
+            margin: 24px 0;
         }
         .footer {
-            margin-top: 30px;
+            margin-top: 40px;
             text-align: center;
             color: #666;
             font-size: 14px;
+            border-top: 1px solid #eaeaea;
+            padding-top: 24px;
+        }
+        .footer a {
+            color: #ff4500;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <div class="container">
- <h1 className="text-4xl font-bold">
-      <span className="text-red-500">Reddit</span>
-      <span className="text-black">Growth</span>
-    </h1>
+        <div class="logo-container">
+            <h1>
+                <span class="reddit-text">Reddit</span><span class="growth-text">Growth</span>
+            </h1>
+        </div>
         <p>${message}</p>
-        <p style="text-align: center;">
+        <div class="button-container">
             <a href="${buttonLink}" class="button">${buttonText}</a>
-        </p>
-        <p style="font-style: italic; color: #888;">If you didn't request this, please ignore this email.</p>
+        </div>
+        <p class="warning-text">If you didn't request this, please ignore this email.</p>
         <div class="footer">
             <p>Thanks,<br><strong>RedditGrowth Team</strong></p>
-            <p>Contact us: <a href="mailto:support@redditgrowth.com">support@redditgrowth.com</a></p>
+            <p>Need help? Contact us at <a href="mailto:support@redditgrowth.com">support@redditgrowth.com</a></p>
         </div>
     </div>
 </body>
