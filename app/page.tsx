@@ -22,18 +22,25 @@ type GetAccountsResponse = {
   error?: string;
 };
 
-
 const AccountsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [accounts, setAccounts] = useState<RedditAccount[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [lastFetchTime, setLastFetchTime] = useState(0);
   const itemsPerPage = 3;
   const router = useRouter();
   
   const fetchAccounts = useCallback(async () => {
+    // Don't fetch if we've fetched within the last second (debounce)
+    const now = Date.now();
+    if (now - lastFetchTime < 1000) {
+      return;
+    }
+    
     setIsLoading(true);
     setError(null);
+    setLastFetchTime(now);
     
     try {
       const result = await getRedditAccounts();
@@ -54,21 +61,23 @@ const AccountsPage = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [lastFetchTime]);
   
   // Initial fetch on mount
   useEffect(() => {
     fetchAccounts();
   }, [fetchAccounts]);
   
-  // Set up polling for updates
+  // Set up polling with dynamic interval
   useEffect(() => {
     const pollInterval = setInterval(() => {
+      // Use a longer polling interval (15 seconds) when there are no accounts
+      const pollingTime = accounts.length === 0 ? 15000 : 5000;
       fetchAccounts();
-    }, 5000); // Poll every 5 seconds
+    }, accounts.length === 0 ? 15000 : 5000);
     
     return () => clearInterval(pollInterval);
-  }, [fetchAccounts]);
+  }, [fetchAccounts, accounts.length]);
   
   // Handle successful account addition
   const handleAccountAdded = useCallback(() => {
@@ -151,60 +160,61 @@ const AccountsPage = () => {
           // return a promise that resolves when the deletion is complete
           return Promise.resolve();
         }}
-        />      ))}
-        </div>
-      )}
-      
-      {accounts.length > itemsPerPage && (
-        <div className="mt-6">
-        <div className="flex flex-wrap items-center justify-center gap-2">
-        <Button
-        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-        disabled={currentPage === 1}
-        variant="outline"
-        className="px-3 py-2"
-        >
-        Previous
-        </Button>
-        
-        <div className="flex flex-wrap gap-1">
-        {pageNumbers.map((pageNumber) => (
-          <Button
-          key={pageNumber}
-          onClick={() => setCurrentPage(pageNumber)}
-          variant={currentPage === pageNumber ? "default" : "outline"}
-          className={currentPage === pageNumber ? 'bg-red-600' : ''}
-          >
-          {pageNumber}
-          </Button>
-        ))}
-        </div>
-        
-        <Button
-        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-        disabled={currentPage === totalPages}
-        variant="outline"
-        className="px-3 py-2"
-        >
-        Next
-        </Button>
-        </div>
-        </div>
-      )}
-      
-      <div className="mt-6 flex justify-center">
+        />
+      ))}
+      </div>
+    )}
+    
+    {accounts.length > itemsPerPage && (
+      <div className="mt-6">
+      <div className="flex flex-wrap items-center justify-center gap-2">
       <Button
-      onClick={handleLogout}
+      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+      disabled={currentPage === 1}
       variant="outline"
-      className="px-4 py-2"
+      className="px-3 py-2"
       >
-      Sign Out
+      Previous
+      </Button>
+      
+      <div className="flex flex-wrap gap-1">
+      {pageNumbers.map((pageNumber) => (
+        <Button
+        key={pageNumber}
+        onClick={() => setCurrentPage(pageNumber)}
+        variant={currentPage === pageNumber ? "default" : "outline"}
+        className={currentPage === pageNumber ? 'bg-red-600' : ''}
+        >
+        {pageNumber}
+        </Button>
+      ))}
+      </div>
+      
+      <Button
+      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+      disabled={currentPage === totalPages}
+      variant="outline"
+      className="px-3 py-2"
+      >
+      Next
       </Button>
       </div>
       </div>
-      </div>
-      </div>
-    );
-  };
-  
-  export default AccountsPage;
+    )}
+    
+    <div className="mt-6 flex justify-center">
+    <Button
+    onClick={handleLogout}
+    variant="outline"
+    className="px-4 py-2"
+    >
+    Sign Out
+    </Button>
+    </div>
+    </div>
+    </div>
+    </div>
+  );
+};
+
+export default AccountsPage;
