@@ -1,18 +1,23 @@
-"use client";
+'use client';
 
 import Link from "next/link";
-import { Button } from "../ui/button";
 
 interface BackButtonProps {
   href: string;
   label: string;
 }
 
-const BackButton = ({ href, label }: BackButtonProps) => {
+const BackButton = ({
+  href,
+  label
+}: BackButtonProps) => {
   return (
-    <Button variant="link" size="sm" className="font-normal w-full" asChild>
-      <Link href={href}>{label}</Link>
-    </Button>
+    <Link 
+    href={href}
+    className="text-slate-50 text-xs hover:text-slate-200 underline-offset-4 hover:underline transition-colors mx-auto"
+    >
+    {label}
+    </Link>
   );
 };
 
