@@ -1,19 +1,20 @@
-import NextAuth from "next-auth";
+// auth.ts
+import NextAuth, { type NextAuthConfig } from "next-auth";
 import authConfig from "@/auth.config";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { getUserById } from "@/data/user";
 import db from "@/lib/db";
 import { UserRole } from "@prisma/client";
 
-// Define admin emails
+// List of admin emails
 const ADMIN_EMAILS = [
   "aminofab@gmail.com",
-  "aminofabian@gmail.com",
-  "zelisline@gmail.com",
   "eminselimaslan@gmail.com",
-
-  // Add more admin emails here
 ];
+
+const isAdminEmail = (email: string | null | undefined): boolean => {
+  return ADMIN_EMAILS.includes(email?.toLowerCase() ?? "");
+};
 
 export const {
   handlers: { GET, POST },
@@ -26,63 +27,113 @@ export const {
     error: "/auth/error",
   },
   events: {
-    async linkAccount({ user }) {
-      // Check if the user's email is in the admin list
-      const isAdmin = ADMIN_EMAILS.includes(user.email?.toLowerCase() ?? "");
-      
-      await db.user.update({
-        where: { id: user.id },
-        data: {
+    async linkAccount({ user, account, profile }) {
+      if (account?.provider === "google" || account?.provider === "github") {
+        const email = profile?.email?.toLowerCase();
+        const isAdmin = isAdminEmail(email);
+        
+        const updateData: any = {
           emailVerified: new Date(),
-          role: isAdmin ? "ADMIN" : "USER",
-        },
-      });
+          role: isAdmin ? UserRole.ADMIN : UserRole.USER
+        };
+
+        if (profile?.name) {
+          const [firstName, ...lastNameParts] = profile.name.split(" ");
+          updateData.firstName = firstName;
+          updateData.lastName = lastNameParts.join(" ");
+        }
+
+        if (email) {
+          updateData.email = email;
+        }
+
+        if (profile?.image) {
+          updateData.image = profile.image;
+        }
+
+        try {
+          const updatedUser = await db.user.update({
+            where: { id: user.id },
+            data: updateData,
+          });
+          console.log("User updated in linkAccount:", updatedUser);
+        } catch (error) {
+          console.error("Error updating user in linkAccount:", error);
+          throw error;
+        }
+      }
     },
   },
   callbacks: {
     async signIn({ user, account }) {
-      console.log({
-        user,
-        account,
-      });
-      // Allow OAuth without email verification
-      if (account?.provider !== "credentials") return true;
+      console.log("SignIn callback:", { user, account });
 
-      const existingUser = await getUserById(user.id ?? "");
-      // Prevent Sign In without Email Verification
+      if (!user.email) return false;
+      
+      // For OAuth providers
+      if (account?.provider !== "credentials") {
+        const isAdmin = isAdminEmail(user.email);
+if (isAdmin && user?.id) {
+  await db.user.update({
+    where: { id: user.id },
+    data: { role: UserRole.ADMIN },
+  });
+}
+        return true;
+      }
+
+      // For credentials provider
+      const existingUser = await getUserById(user?.id ?? '');
       if (!existingUser?.emailVerified) return false;
 
-      // TODO: Add 2FA Check
+      // Update role if needed
+      const isAdmin = isAdminEmail(existingUser.email);
+      if (isAdmin && existingUser.role !== UserRole.ADMIN) {
+        await db.user.update({
+          where: { id: user.id },
+          data: { role: UserRole.ADMIN },
+        });
+      }
+
       return true;
     },
 
     async session({ token, session }) {
+      console.log("Session callback - Input:", { token, session });
+      
       if (token.sub && session.user) {
         session.user.id = token.sub;
-      }
-      if (session.user) {
         session.user.name = token.name as string;
-        session.user.firstName = token.firstName;
-        session.user.lastName = token.lastName;
+        session.user.firstName = token.firstName as string;
+        session.user.lastName = token.lastName as string;
         session.user.email = token.email as string;
         session.user.role = token.role as UserRole;
-        session.user.image = token.picture;
+        session.user.image = token.picture as string;
         session.user.emailVerified = token.emailVerified as Date | null;
-        session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean;
       }
 
+      console.log("Session callback - Output:", session);
       return session;
     },
-    async jwt({ token }) {
-      if (!token.sub) {
-        return token;
-      }
+
+    async jwt({ token, user, account, profile }) {
+      console.log("JWT callback - Input:", { token, user, account, profile });
+      
+      if (!token.sub) return token;
+
       const existingUser = await getUserById(token.sub);
-      if (!existingUser) {
-        return token;
+      if (!existingUser) return token;
+
+      // Check and update admin status
+      const isAdmin = isAdminEmail(existingUser.email);
+      if (isAdmin && existingUser.role !== UserRole.ADMIN) {
+        await db.user.update({
+          where: { id: existingUser.id },
+          data: { role: UserRole.ADMIN },
+        });
+        existingUser.role = UserRole.ADMIN;
       }
 
-      // Combine firstName and lastName into a single name field
       token.name = `${existingUser.firstName || ''} ${existingUser.lastName || ''}`.trim();
       token.firstName = existingUser.firstName;
       token.lastName = existingUser.lastName;
@@ -90,12 +141,11 @@ export const {
       token.role = existingUser.role;
       token.picture = existingUser.image;
       token.emailVerified = existingUser.emailVerified;
-      // token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
 
+      console.log("JWT callback - Output token:", token);
       return token;
     },
   },
-
   adapter: PrismaAdapter(db),
   session: { strategy: "jwt" },
   ...authConfig,
