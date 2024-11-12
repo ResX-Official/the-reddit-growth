@@ -43,7 +43,7 @@ const createEmailTemplate = (
             font-weight: bold;
         }
         h1 span {
-            color: #ff6b00;
+            color: #800000;
         }
         p {
             margin-bottom: 20px;
@@ -53,7 +53,7 @@ const createEmailTemplate = (
         .button {
             display: inline-block;
             padding: 12px 24px;
-            background-color: #ff6b00;
+            background-color: #800000;
             color: #ffffff;
             text-decoration: none;
             border-radius: 25px;
@@ -63,7 +63,7 @@ const createEmailTemplate = (
             font-size: 14px;
         }
         .button:hover {
-            background-color: #e55c00;
+            background-color: #800000;
         }
         .footer {
             margin-top: 30px;
