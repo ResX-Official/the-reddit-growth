@@ -31,6 +31,14 @@ export const authRoutes = [
   "/auth/new-password"
 ];
 
+
+export const adminRoutes = [
+  "/reddit-analytics",
+  "/admin"
+  // Add other admin routes here
+];
+
+
 // The prefix for the api routes
 //Routes that start with this prefix are used for API authentication and authorization
 // @type {string}

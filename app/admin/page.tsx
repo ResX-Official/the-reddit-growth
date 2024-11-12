@@ -5,7 +5,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { User, UserRole, RedditAccount } from "@prisma/client";
 import { useState } from 'react';
 import db from "@/lib/db";
 

@@ -5,6 +5,16 @@ import { getUserById } from "@/data/user";
 import db from "@/lib/db";
 import { UserRole } from "@prisma/client";
 
+// Define admin emails
+const ADMIN_EMAILS = [
+  "aminofab@gmail.com",
+  "aminofabian@gmail.com",
+  "zelisline@gmail.com",
+  "eminselimaslan@gmail.com",
+
+  // Add more admin emails here
+];
+
 export const {
   handlers: { GET, POST },
   auth,
@@ -17,10 +27,14 @@ export const {
   },
   events: {
     async linkAccount({ user }) {
+      // Check if the user's email is in the admin list
+      const isAdmin = ADMIN_EMAILS.includes(user.email?.toLowerCase() ?? "");
+      
       await db.user.update({
         where: { id: user.id },
         data: {
           emailVerified: new Date(),
+          role: isAdmin ? "ADMIN" : "USER",
         },
       });
     },
@@ -33,6 +47,7 @@ export const {
       });
       // Allow OAuth without email verification
       if (account?.provider !== "credentials") return true;
+
       const existingUser = await getUserById(user.id ?? "");
       // Prevent Sign In without Email Verification
       if (!existingUser?.emailVerified) return false;
@@ -76,7 +91,6 @@ export const {
       token.picture = existingUser.image;
       token.emailVerified = existingUser.emailVerified;
       // token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
-
 
       return token;
     },

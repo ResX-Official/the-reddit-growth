@@ -5,13 +5,8 @@ import {
   apiAuthPrefix,
   authRoutes,
   publicRoutes,
+  adminRoutes
 } from "@/routes";
-
-const adminRoutes = [
-  "/reddit-analytics",
-  "/admin"
-  // Add other admin routes here
-];
 
 export const { auth } = NextAuth(authConfig);
 
