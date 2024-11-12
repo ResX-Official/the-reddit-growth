@@ -53,7 +53,7 @@ export async function addRedditAccount(formData: z.infer<typeof RedditAccountSch
       },
     });
 
-    revalidatePath('/dashboard');
+    revalidatePath('/');
     
     return {
       success: true,

@@ -77,12 +77,14 @@ model RedditAccount {
   id            String   @id @default(cuid())
   userId        String
   redditUsername String
+  redditPassword String? // Making it optional since existing accounts won't have it
   accessToken   String
   refreshToken  String
   tokenExpires  DateTime
   karmaCount    Int
+  createdAt     DateTime @default(now()) // Adding this to sort by latest
+  updatedAt     DateTime @updatedAt      // Track updates
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, redditUsername])
 }
-

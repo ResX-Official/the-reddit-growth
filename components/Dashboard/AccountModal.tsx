@@ -26,7 +26,13 @@ interface RedditUser {
   url: string;
 }
 
-export default function AddAccountModal() {
+interface AddAccountModalProps {
+  onAccountAdded: () => void;
+}
+
+
+
+const AddAccountModal: React.FC<AddAccountModalProps> = ({ onAccountAdded }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
@@ -223,3 +229,6 @@ export default function AddAccountModal() {
     </Dialog>
   );
 }
+
+
+export default AddAccountModal;
