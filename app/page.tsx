@@ -145,61 +145,66 @@ const AccountsPage = () => {
         karma={account.karmaCount}
         hasPassword={account.hasPassword}
         onPasswordUpdate={fetchAccounts}
-        />
-      ))}
-      </div>
-    )}
-    
-    {accounts.length > itemsPerPage && (
-      <div className="mt-6">
-      <div className="flex flex-wrap items-center justify-center gap-2">
-      <Button
-      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-      disabled={currentPage === 1}
-      variant="outline"
-      className="px-3 py-2"
-      >
-      Previous
-      </Button>
+        onDelete={async (id) => {
+          // implement the deletion logic here
+          console.log(`Deleting account with id: ${id}`);
+          // return a promise that resolves when the deletion is complete
+          return Promise.resolve();
+        }}
+        />      ))}
+        </div>
+      )}
       
-      <div className="flex flex-wrap gap-1">
-      {pageNumbers.map((pageNumber) => (
+      {accounts.length > itemsPerPage && (
+        <div className="mt-6">
+        <div className="flex flex-wrap items-center justify-center gap-2">
         <Button
-        key={pageNumber}
-        onClick={() => setCurrentPage(pageNumber)}
-        variant={currentPage === pageNumber ? "default" : "outline"}
-        className={currentPage === pageNumber ? 'bg-red-600' : ''}
+        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+        disabled={currentPage === 1}
+        variant="outline"
+        className="px-3 py-2"
         >
-        {pageNumber}
+        Previous
         </Button>
-      ))}
-      </div>
+        
+        <div className="flex flex-wrap gap-1">
+        {pageNumbers.map((pageNumber) => (
+          <Button
+          key={pageNumber}
+          onClick={() => setCurrentPage(pageNumber)}
+          variant={currentPage === pageNumber ? "default" : "outline"}
+          className={currentPage === pageNumber ? 'bg-red-600' : ''}
+          >
+          {pageNumber}
+          </Button>
+        ))}
+        </div>
+        
+        <Button
+        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+        disabled={currentPage === totalPages}
+        variant="outline"
+        className="px-3 py-2"
+        >
+        Next
+        </Button>
+        </div>
+        </div>
+      )}
       
+      <div className="mt-6 flex justify-center">
       <Button
-      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-      disabled={currentPage === totalPages}
+      onClick={handleLogout}
       variant="outline"
-      className="px-3 py-2"
+      className="px-4 py-2"
       >
-      Next
+      Sign Out
       </Button>
       </div>
       </div>
-    )}
-    
-    <div className="mt-6 flex justify-center">
-    <Button
-    onClick={handleLogout}
-    variant="outline"
-    className="px-4 py-2"
-    >
-    Sign Out
-    </Button>
-    </div>
-    </div>
-    </div>
-    </div>
-  );
-};
-
-export default AccountsPage;
+      </div>
+      </div>
+    );
+  };
+  
+  export default AccountsPage;
