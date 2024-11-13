@@ -34,7 +34,6 @@ export const authRoutes = [
 
 export const adminRoutes = [
   "/reddit-analytics",
-  "/admin"
   // Add other admin routes here
 ];
 
