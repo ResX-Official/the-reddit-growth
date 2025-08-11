@@ -3,18 +3,15 @@
 // @type {string[]}
 
 export const publicRoutes = [
+  "/",
   "/auth/new-verification",
-  "/dashboard",
   "/auth/verify-email",
   "/auth/new-password",
   "/auth/reset",
-  "/auth/new-verification",
-  "/auth/new-password",
   "/auth/login",
   "/auth/register",
   "/auth/error",
-  "/auth/reset",
-  "/auth/new-password"
+  "/subreddit-tracker"
 ];
 
 /*
@@ -33,6 +30,7 @@ export const authRoutes = [
 
 
 export const adminRoutes = [
+  "/admin",
   "/reddit-analytics",
   // Add other admin routes here
 ];

@@ -135,6 +135,23 @@ const AccountsPage = () => {
     </div>
     <div className="p-4 sm:p-3 lg:p-4">
     <div className="mx-auto max-w-lg sm:max-w-xl lg:max-w-2xl">
+    <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center space-x-4">
+        <Button 
+          variant="outline" 
+          className="bg-white border-red-600 text-red-600 font-medium hover:bg-red-50"
+        >
+          Home
+        </Button>
+        <Button 
+          variant="outline" 
+          className="bg-white border-red-600 text-red-600 font-medium hover:bg-red-50"
+          onClick={() => router.push('/subreddit-tracker')}
+        >
+          Subreddit Tracker
+        </Button>
+      </div>
+    </div>
     <div className="mb-2 flex items-center justify-between">
     <h1 className="text-xl sm:text-2xl font-bold text-red-900">My Reddit Accounts</h1>
     <AddAccountModal onAccountAdded={handleAccountAdded} />
