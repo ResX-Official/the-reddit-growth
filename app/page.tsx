@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { getRedditAccounts } from '@/app/actions/datadisplay';
 import Header from '@/components/common/Logo';
 import AddAccountModal from '@/components/Dashboard/AccountModal';
-import { signOut } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import UserAccountCard from '@/components/Dashboard/UserAccountCard';
 
@@ -23,6 +23,7 @@ type GetAccountsResponse = {
 };
 
 const AccountsPage = () => {
+  const { data: session, status } = useSession();
   const [currentPage, setCurrentPage] = useState(1);
   const [accounts, setAccounts] = useState<RedditAccount[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -30,8 +31,21 @@ const AccountsPage = () => {
   const [lastFetchTime, setLastFetchTime] = useState(0);
   const itemsPerPage = 3;
   const router = useRouter();
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/auth/login');
+      return;
+    }
+  }, [status, router]);
   
   const fetchAccounts = useCallback(async () => {
+    // Don't fetch if not authenticated
+    if (status !== 'authenticated') {
+      return;
+    }
+    
     // Don't fetch if we've fetched within the last second (debounce)
     const now = Date.now();
     if (now - lastFetchTime < 1000) {
@@ -61,7 +75,7 @@ const AccountsPage = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [lastFetchTime]);
+  }, [lastFetchTime, status]);
   
   // Initial fetch on mount
   useEffect(() => {
@@ -99,6 +113,22 @@ const AccountsPage = () => {
       setError('Failed to sign out. Please try again.');
     }
   };
+
+  // Show loading while checking authentication
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-red-50 p-4 flex items-center justify-center">
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+          <p className="text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render anything if unauthenticated (will redirect)
+  if (status === 'unauthenticated') {
+    return null;
+  }
   
   if (error) {
     return (
