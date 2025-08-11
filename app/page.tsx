@@ -35,8 +35,21 @@ const AccountsPage = () => {
   // Redirect to login if not authenticated
   useEffect(() => {
     if (status === 'unauthenticated') {
+      console.log('Redirecting to login - unauthenticated');
       router.push('/auth/login');
       return;
+    }
+  }, [status, router]);
+
+  // Force redirect after 5 seconds if still loading
+  useEffect(() => {
+    if (status === 'loading') {
+      const timeout = setTimeout(() => {
+        console.log('Forcing redirect to login - timeout');
+        router.push('/auth/login');
+      }, 5000);
+      
+      return () => clearTimeout(timeout);
     }
   }, [status, router]);
   
@@ -120,6 +133,8 @@ const AccountsPage = () => {
       <div className="min-h-screen bg-red-50 p-4 flex items-center justify-center">
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <p className="text-gray-600">Checking authentication...</p>
+          <p className="text-sm text-gray-500 mt-2">Status: {status}</p>
+          <p className="text-sm text-gray-500">Session: {session ? 'exists' : 'null'}</p>
         </div>
       </div>
     );

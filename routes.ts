@@ -10,7 +10,8 @@ export const publicRoutes = [
   "/auth/login",
   "/auth/register",
   "/auth/error",
-  "/subreddit-tracker"
+  "/subreddit-tracker",
+  "/auth-test"
 ];
 
 /*
