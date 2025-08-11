@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { getRedditAccounts } from '@/app/actions/datadisplay';
 import Header from '@/components/common/Logo';
 import AddAccountModal from '@/components/Dashboard/AccountModal';
-import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import UserAccountCard from '@/components/Dashboard/UserAccountCard';
 
@@ -23,7 +22,6 @@ type GetAccountsResponse = {
 };
 
 const AccountsPage = () => {
-  const { data: session, status } = useSession();
   const [currentPage, setCurrentPage] = useState(1);
   const [accounts, setAccounts] = useState<RedditAccount[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -31,34 +29,8 @@ const AccountsPage = () => {
   const [lastFetchTime, setLastFetchTime] = useState(0);
   const itemsPerPage = 3;
   const router = useRouter();
-
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      console.log('Redirecting to login - unauthenticated');
-      router.push('/auth/login');
-      return;
-    }
-  }, [status, router]);
-
-  // Force redirect after 5 seconds if still loading
-  useEffect(() => {
-    if (status === 'loading') {
-      const timeout = setTimeout(() => {
-        console.log('Forcing redirect to login - timeout');
-        router.push('/auth/login');
-      }, 5000);
-      
-      return () => clearTimeout(timeout);
-    }
-  }, [status, router]);
   
   const fetchAccounts = useCallback(async () => {
-    // Don't fetch if not authenticated
-    if (status !== 'authenticated') {
-      return;
-    }
-    
     // Don't fetch if we've fetched within the last second (debounce)
     const now = Date.now();
     if (now - lastFetchTime < 1000) {
@@ -88,7 +60,7 @@ const AccountsPage = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [lastFetchTime, status]);
+  }, [lastFetchTime]);
   
   // Initial fetch on mount
   useEffect(() => {
@@ -119,31 +91,12 @@ const AccountsPage = () => {
   
   const handleLogout = async () => {
     try {
-      await signOut({ redirect: false });
+      // Just refresh the page since we're removing auth
       router.refresh();
-      router.push('/auth/login');
     } catch (err) {
-      setError('Failed to sign out. Please try again.');
+      setError('Failed to refresh. Please try again.');
     }
   };
-
-  // Show loading while checking authentication
-  if (status === 'loading') {
-    return (
-      <div className="min-h-screen bg-red-50 p-4 flex items-center justify-center">
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <p className="text-gray-600">Checking authentication...</p>
-          <p className="text-sm text-gray-500 mt-2">Status: {status}</p>
-          <p className="text-sm text-gray-500">Session: {session ? 'exists' : 'null'}</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Don't render anything if unauthenticated (will redirect)
-  if (status === 'unauthenticated') {
-    return null;
-  }
   
   if (error) {
     return (
@@ -263,16 +216,6 @@ const AccountsPage = () => {
       </div>
       </div>
     )}
-    
-    <div className="mt-6 flex justify-center">
-    <Button
-    onClick={handleLogout}
-    variant="outline"
-    className="px-4 py-2"
-    >
-    Sign Out
-    </Button>
-    </div>
     </div>
     </div>
     </div>

@@ -46,33 +46,29 @@ export type UpdatePasswordResponse = {
 // ----------------------
 export async function getRedditAccounts(): Promise<ApiResponse<RedditAccount[]>> {
   try {
-    const session = await auth();
-    console.log("Session:", session);
+    // Return mock data for now since we removed authentication
+    const mockAccounts: RedditAccount[] = [
+      {
+        id: "1",
+        redditUsername: "demo_user_1",
+        karmaCount: 1250,
+        hasPassword: true,
+      },
+      {
+        id: "2", 
+        redditUsername: "demo_user_2",
+        karmaCount: 850,
+        hasPassword: false,
+      },
+      {
+        id: "3",
+        redditUsername: "demo_user_3", 
+        karmaCount: 2100,
+        hasPassword: true,
+      }
+    ];
 
-    if (!session?.user?.id) {
-      return { success: false, error: "Not authenticated" };
-    }
-
-    const redditAccounts = await db.redditAccount.findMany({
-        where: { userId: session.user.id },
-        select: {
-          id: true,
-          redditUsername: true,
-          karmaCount: true,
-          redditPassword: true,
-        },
-        orderBy: { createdAt: 'desc' },
-      });
-
-    const formattedAccounts = redditAccounts.map((account) => ({
-
-      id: account.id,
-      redditUsername: account.redditUsername,
-      karmaCount: account.karmaCount,
-      hasPassword: !!account.redditPassword,
-    }));
-
-    return { success: true, data: formattedAccounts };
+    return { success: true, data: mockAccounts };
   } catch (error) {
     console.error("Error fetching Reddit accounts:", error);
     return { success: false, error: "Failed to fetch Reddit accounts. Please try again later." };
@@ -87,44 +83,18 @@ export async function addRedditAccount(
 ): Promise<ApiResponse<RedditAccount>> {
   try {
     const validatedData = RedditAccountSchema.parse(formData);
-    const session = await auth();
 
-    if (!session?.user?.id) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    const existingAccount = await db.redditAccount.findFirst({
-      where: {
-        userId: session.user.id,
-        redditUsername: validatedData.redditUsername,
-      },
-    });
-
-    if (existingAccount) {
-      return { success: false, error: "Reddit account already connected" };
-    }
-
-    const redditAccount: PrismaRedditAccount = await db.redditAccount.create({
-      data: {
-        userId: session.user.id,
-        redditUsername: validatedData.redditUsername,
-        accessToken: validatedData.accessToken,
-        refreshToken: validatedData.refreshToken,
-        tokenExpires: new Date(Date.now() + 1000 * 60 * 60), // 1 hour from now
-        karmaCount: validatedData.karmaCount,
-      },
-    });
-
-    revalidatePath('/dashboard');
+    // Return mock success response since we removed authentication
+    const newAccount: RedditAccount = {
+      id: Math.random().toString(36).substr(2, 9),
+      redditUsername: validatedData.redditUsername,
+      karmaCount: validatedData.karmaCount,
+      hasPassword: false,
+    };
 
     return {
       success: true,
-      data: {
-        id: redditAccount.id,
-        redditUsername: redditAccount.redditUsername,
-        karmaCount: redditAccount.karmaCount,
-        hasPassword: false,
-      },
+      data: newAccount,
     };
   } catch (error) {
     console.error("Failed to add Reddit account:", error);
@@ -144,29 +114,8 @@ export async function updateRedditPassword(
 ): Promise<UpdatePasswordResponse> {
   try {
     const validatedPassword = UpdatePasswordSchema.shape.password.parse(password);
-    const session = await auth();
 
-    if (!session?.user?.id) {
-      return { success: false, error: "Not authenticated" };
-    }
-
-    const account: PrismaRedditAccount | null = await db.redditAccount.findFirst({
-      where: { id: accountId, userId: session.user.id },
-    });
-
-    if (!account) {
-      return { success: false, error: "Reddit account not found or unauthorized" };
-    }
-
-    await db.redditAccount.update({
-      where: { id: accountId },
-      data: {
-        redditPassword: validatedPassword,
-        updatedAt: new Date(),
-      },
-    });
-
-    revalidatePath('/dashboard');
+    // Return mock success response since we removed authentication
     return { success: true };
   } catch (error) {
     console.error("Failed to update Reddit password:", error);
